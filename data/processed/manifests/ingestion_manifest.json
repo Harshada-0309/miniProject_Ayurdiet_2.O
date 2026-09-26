@@ -1,0 +1,28 @@
+{
+  "timestamp": "2026-09-25T14:38:17.491548Z",
+  "elapsed_seconds": 1057.4,
+  "source_zip": "E:\\final Ayur K.zip",
+  "total_pdfs": 24,
+  "total_pages_extracted": 3374,
+  "total_chunks": 11437,
+  "chunking": {
+    "chunk_size": 700,
+    "chunk_overlap": 120
+  },
+  "embeddings": {
+    "model": "all-MiniLM-L6-v2",
+    "dimension": 384,
+    "count": 11437,
+    "storage_file": "C:\\Users\\DELL\\AyurDiet project\\Ayurdiet\\data\\processed\\embeddings\\chunk_embeddings.npy"
+  },
+  "qdrant": {
+    "collection": "ayurdiet_knowledge",
+    "vector_count": 11437,
+    "mode": "local_embedded",
+    "location": "C:\\Users\\DELL\\AyurDiet project\\Ayurdiet\\data\\processed\\qdrant_storage"
+  },
+  "bm25": {
+    "index_dir": "C:\\Users\\DELL\\AyurDiet project\\Ayurdiet\\data\\processed\\bm25_index",
+    "entries_indexed": 11437
+  }
+}
