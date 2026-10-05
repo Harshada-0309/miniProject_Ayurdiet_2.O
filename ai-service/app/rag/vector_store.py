@@ -180,6 +180,9 @@ class QdrantVectorStore:
         """
         Semantic vector similarity search with optional metadata filtering.
         """
+        if not self.client.collection_exists(self.collection_name):
+            return []
+
         qdrant_filter: Optional[Filter] = None
         if filters:
             conditions = []

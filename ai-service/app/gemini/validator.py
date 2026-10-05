@@ -6,7 +6,7 @@ and clinical language compliance before any output is shown to the dietitian.
 
 import math
 import re
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 from .models import DeterministicGuardrailResult
 
 

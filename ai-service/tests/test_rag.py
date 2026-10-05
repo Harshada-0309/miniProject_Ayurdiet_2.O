@@ -208,8 +208,75 @@ from app.main import get_retriever
 
 @pytest.fixture(scope="module")
 def retriever_instance():
-    """Provides initialized retriever singleton with existing knowledge base."""
-    return get_retriever()
+    """Provides initialized retriever singleton with existing knowledge base, seeding test fixtures if empty."""
+    retriever = get_retriever()
+    status = retriever.vector_store.get_connection_status()
+    bm25_loaded = retriever.bm25_index.load()
+    if not status.get("exists") or status.get("vector_count", 0) == 0 or not bm25_loaded or len(retriever.bm25_index.chunk_store) == 0:
+        sample_chunks = [
+            KnowledgeChunk(
+                chunk_id="test_c1",
+                document_id="ayur_doc_kapha",
+                text="In winter (hemanta and shishira), Kapha dosha tends to accumulate. Recommended foods suitable for Kapha in winter include pungent, bitter, and astringent tastes, warm and dry foods, honey, and barley.",
+                page_number=1,
+                source_reference=SourceReference(document="kapha_winter_guidelines.pdf", page=1),
+                metadata={"prakriti": "kapha", "season": "winter"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c2",
+                document_id="ayur_doc_vata",
+                text="Vata dosha digestion and Agni require warm, unctuous (snigdha), sweet, sour, and salty foods. Cooked grains with ghee strengthen mandagni and vishamagni in Vata individuals.",
+                page_number=2,
+                source_reference=SourceReference(document="vata_digestion.pdf", page=2),
+                metadata={"prakriti": "vata", "topic": "digestion"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c3",
+                document_id="ayur_doc_pathya",
+                text="Pathya and Apathya dietary rules define wholesome and unwholesome foods. Pathya promotes bodily equilibrium and longevity while Apathya aggravates doshas and blocks srotas.",
+                page_number=3,
+                source_reference=SourceReference(document="pathya_apathya.pdf", page=3),
+                metadata={"topic": "pathya_apathya"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c4",
+                document_id="ayur_doc_diabetes",
+                text="Dietary guidelines for diabetes mellitus (Madhumeha, Prameha) emphasize whole grains such as barley (yava), bitter melon (karela), fenugreek, and low glycemic index foods to regulate blood glucose.",
+                page_number=4,
+                source_reference=SourceReference(document="diabetes_guidelines.pdf", page=4),
+                metadata={"condition": "diabetes"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c5",
+                document_id="ayur_doc_cardiac",
+                text="Cardiac disorders and heart disease (Hridroga) require heart-healthy (hridya) dietary guidelines: low sodium, avoidance of saturated fats and heavy deep fried items, and incorporation of garlic, arjuna, and fiber.",
+                page_number=5,
+                source_reference=SourceReference(document="cardiac_guidelines.pdf", page=5),
+                metadata={"condition": "cardiac_disorders"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c6",
+                document_id="ayur_doc_allergy",
+                text="Food allergy reference doses and hypersensitivity guidance indicate eliminating trigger allergens such as nuts, shellfish, or dairy to prevent acute anaphylaxis or adverse reactions.",
+                page_number=6,
+                source_reference=SourceReference(document="food_allergy.pdf", page=6),
+                metadata={"topic": "food_allergies"},
+            ),
+            KnowledgeChunk(
+                chunk_id="test_c7",
+                document_id="ayur_doc_drug_interaction",
+                text="Food drug interactions and impact on medications must be monitored when herbs and nutrients alter drug bioavailability, CYP450 metabolism, or clearance.",
+                page_number=7,
+                source_reference=SourceReference(document="food_drug_interactions.pdf", page=7),
+                metadata={"topic": "food_drug_interactions"},
+            ),
+        ]
+        retriever.bm25_index.build(sample_chunks)
+        retriever.vector_store.ensure_collection(recreate=True)
+        embeddings = retriever.embedding_service.embed_texts([c.text for c in sample_chunks])
+        retriever.vector_store.upsert_chunks(sample_chunks, embeddings)
+
+    return retriever
 
 
 
